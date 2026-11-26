@@ -1,0 +1,19 @@
+# NeoForge. No modLoader line = no @Mod class needed; SeedGuard is pure mixins.
+license = "MIT"
+
+[[mods]]
+modId = "seedguard"
+version = "${version}"
+displayName = "SeedGuard"
+description = "Makes the world seed uncrackable (SeedCrackerX & co.) while keeping world generation vanilla. Server-side only."
+displayTest = "IGNORE_ALL_VERSION"
+
+[[mixins]]
+config = "seedguard.mixins.json"
+
+[[dependencies.seedguard]]
+modId = "minecraft"
+type = "required"
+versionRange = "${forge_range}"
+ordering = "NONE"
+side = "BOTH"

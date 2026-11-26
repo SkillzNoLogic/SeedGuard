@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "seedguard",
+  "version": "${version}",
+  "name": "SeedGuard",
+  "description": "Makes the world seed uncrackable (SeedCrackerX & co.) while keeping world generation vanilla. Server-side only.",
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["dev.seedguard.fabric.SeedGuardFabric"]
+  },
+  "mixins": ["seedguard.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.14.21",
+    "minecraft": "${mc_range}",
+    "java": ">=${java}"
+  }
+}

@@ -1,0 +1,87 @@
+// Minecraft 26.x ships unobfuscated, and Fabric, Forge and NeoForge all run it under Mojang's
+// own names. So no remapping toolchain is needed: we compile against the official server jar and
+// emit ONE jar carrying fabric.mod.json, META-INF/mods.toml (Forge) and
+// META-INF/neoforge.mods.toml. The mixins target the real names directly (no refmap).
+//
+//   ./gradlew build -Pmc=26.3   (default)
+//   ./gradlew build -Pmc=26.1   (covers 26.1 – 26.2)
+import groovy.json.JsonSlurper
+
+plugins {
+    id "java"
+}
+
+def mc = findProperty("mc") ?: "26.3"
+def vp = new Properties()
+file("versions/${mc}.properties").withInputStream { vp.load(it) }
+
+group = "dev.seedguard"
+version = "1.0.0"
+
+repositories {
+    mavenCentral()
+    maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
+}
+
+def mcDir = layout.buildDirectory.dir("minecraft/${vp.minecraft_version}").get().asFile
+
+def fetchMinecraft = tasks.register("fetchMinecraft") {
+    description = "Downloads the official Minecraft server jar and its libraries (compile-only)."
+    def v = vp.minecraft_version
+    outputs.dir(mcDir)
+    onlyIf { !new File(mcDir, ".complete").exists() }
+    doLast {
+        mcDir.mkdirs()
+        def manifest = new JsonSlurper().parse(new URL("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"))
+        def entry = manifest.versions.find { it.id == v }
+        if (entry == null) throw new GradleException("Unknown Minecraft version ${v}")
+        def meta = new JsonSlurper().parse(new URL(entry.url))
+        def bundle = new File(mcDir, "bundle.jar")
+        new URL(meta.downloads.server.url).withInputStream { i -> bundle.withOutputStream { it << i } }
+        // The server download is a bundler: the real server jar and libraries are nested inside.
+        project.copy {
+            from(zipTree(bundle)) { include "META-INF/versions/**/*.jar", "META-INF/libraries/**/*.jar" }
+            into mcDir
+            eachFile { it.path = it.name }
+            includeEmptyDirs = false
+        }
+        bundle.delete()
+        new File(mcDir, ".complete").text = v
+    }
+}
+
+dependencies {
+    compileOnly fileTree(dir: mcDir, include: "*.jar")
+    // Upstream Mixin, NOT Fabric's fork: the fork declares @Redirect/@ModifyArg `at` as an array,
+    // which upstream Mixin + MixinExtras on Forge can't read. Fabric accepts the upstream form.
+    compileOnly("org.spongepowered:mixin:0.8.7") { transitive = false }
+}
+
+sourceSets.main.java.srcDirs(
+        "../shared/src/main/java",
+        "../mod/common/src/main/java",
+        "../mod/versioned/${vp.variant}")
+sourceSets.main.resources.srcDir("../mod/common/src/main/resources")
+
+tasks.named("compileJava") { dependsOn fetchMinecraft }
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 25 // Minecraft 26.x requires Java 25
+    options.encoding = "UTF-8"
+}
+
+processResources {
+    def props = [version: project.version, fabric_range: vp.fabric_range, forge_range: vp.forge_range]
+    inputs.properties props
+    filesMatching(["fabric.mod.json", "META-INF/mods.toml", "META-INF/neoforge.mods.toml"]) { expand props }
+}
+
+jar {
+    archiveFileName = "SeedGuard-mc${vp.label}.jar"
+    manifest {
+        // Forge registers mixins from the manifest; NeoForge reads [[mixins]] in neoforge.mods.toml.
+        attributes("MixinConfigs": "seedguard.mixins.json",
+                "Implementation-Title": "SeedGuard",
+                "Implementation-Version": project.version)
+    }
+}

@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.seedguard.mod.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "ChunkGeneratorMixin",
+    "ChunkGeneratorStructureStateMixin",
+    "MinecraftServerMixin",
+    "NoiseBasedChunkGeneratorMixin",
+    "PlayerListMixin",
+    "RandomSpreadStructurePlacementMixin",
+    "ServerGamePacketListenerImplMixin",
+    "ServerPlayerMixin",
+    "SlimeMixin",
+    "SpikeFeatureMixin",
+    "StructureCheckMixin",
+    "StructurePlacementAccessor",
+    "StructurePlacementMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

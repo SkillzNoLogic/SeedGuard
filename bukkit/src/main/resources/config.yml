@@ -1,0 +1,50 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  SeedGuard: keep the world vanilla, keep the seed secret.
+# ─────────────────────────────────────────────────────────────────────────────
+#  What runs where:
+#   Spigot / Paper / Purpur : random per-world structure salts (spigot.yml seed-*),
+#                             fake hashed seed in login/respawn packets
+#   Paper / Purpur          : + random per-feature decoration seeds (dungeons,
+#                             desert wells, end gateways, ores...) + client mod probe
+#   CraftBukkit (no Spigot) : hashed-seed spoofing only
+# ─────────────────────────────────────────────────────────────────────────────
+
+structures:
+  # Write random seed-* salts into spigot.yml for protected worlds.
+  enabled: true
+  # Existing worlds keep vanilla salts. Moving structures under already-explored land
+  # would leave cut-off structures at the old/new chunk border. Set this to true only if
+  # you accept that (for example, the world is pre-generated and you'll trim it).
+  protect-existing-worlds: false
+  # Also randomise slime chunks (seed-slime) on protected worlds.
+  slime-chunks: true
+
+features:
+  # Paper/Purpur: turn on feature-seeds.generate-random-seeds-for-all in
+  # config/paper-world-defaults.yml. The first time this flips, you must RESTART ONCE
+  # before players explore or new worlds are created.
+  paper-feature-seeds: true
+
+hashed-seed:
+  # Replace the SHA-256 "hashed seed" in login/respawn packets with a secret per-world value.
+  # SeedCrackerX uses it to recover the final 16 bits of the seed instantly.
+  # Side effect: client-side biome colour blending at biome borders shifts very slightly.
+  enabled: true
+
+detection:
+  # Translation-key probe for client seed-cracking mods (Paper/Purpur only).
+  # A sign editor flashes for one frame about 3 seconds after joining.
+  enabled: true
+  delay-ticks: 60
+  timeout-ticks: 200
+  # How many of the keys below must resolve to count as detected.
+  threshold: 2
+  # Up to 4 entries in the form "translation.key|English text", separated by ';'.
+  # The defaults are SeedCrackerX keys.
+  keys: "info.noWorldSeeds|No world seeds found;finder.buriedTreasures|Buried treasures;settings.openDatabase|Open the database;finder.endCities|End cities"
+  # kick | log
+  action: kick
+  kick-message: "&cSeed-cracking mods (SeedCrackerX) are not allowed on this server."
+  notify-staff: true
+  # Extra console commands to run on detection. %player% is replaced with the player's name.
+  commands: []

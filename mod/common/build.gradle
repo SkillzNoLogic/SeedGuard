@@ -1,0 +1,10 @@
+architectury {
+    common(rootProject.platforms.split(",").collect { it.trim() })
+}
+
+sourceSets.main.java.srcDirs("../../shared/src/main/java", "../versioned/legacy")
+
+dependencies {
+    // Only for the Mixin annotations on the compile classpath; nothing Fabric-specific is used.
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+}

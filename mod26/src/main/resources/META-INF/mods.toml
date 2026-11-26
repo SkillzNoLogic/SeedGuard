@@ -1,0 +1,18 @@
+# Forge. "lowcodefml" = a mod with no @Mod class; SeedGuard is pure mixins.
+modLoader = "lowcodefml"
+loaderVersion = "[1,)"
+license = "MIT"
+
+[[mods]]
+modId = "seedguard"
+version = "${version}"
+displayName = "SeedGuard"
+description = "Makes the world seed uncrackable (SeedCrackerX & co.) while keeping world generation vanilla. Server-side only."
+displayTest = "IGNORE_ALL_VERSION"
+
+[[dependencies.seedguard]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${forge_range}"
+ordering = "NONE"
+side = "BOTH"

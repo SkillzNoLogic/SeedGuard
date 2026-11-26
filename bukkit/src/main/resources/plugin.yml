@@ -1,0 +1,25 @@
+name: SeedGuard
+version: '${version}'
+main: dev.seedguard.bukkit.SeedGuardPlugin
+api-version: '1.20'
+# STARTUP is required. It lets SeedGuard write per-world structure salts before the
+# server builds its worlds, so protection applies on the very first boot.
+load: STARTUP
+description: Makes world seeds uncrackable (SeedCrackerX & co.) while keeping generation vanilla.
+authors: [SeedGuard]
+commands:
+  seedguard:
+    description: SeedGuard status and tools
+    usage: /seedguard <status|probe <player>|reload>
+    permission: seedguard.admin
+    aliases: [sg]
+permissions:
+  seedguard.admin:
+    description: Use /seedguard
+    default: op
+  seedguard.notify:
+    description: Receive seed-cracker detection alerts
+    default: op
+  seedguard.bypass:
+    description: Skip the client mod probe
+    default: false

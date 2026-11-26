@@ -1,0 +1,18 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+license = "MIT"
+
+[[mods]]
+modId = "seedguard"
+version = "${version}"
+displayName = "SeedGuard"
+description = "Makes the world seed uncrackable (SeedCrackerX & co.) while keeping world generation vanilla. Server-side only."
+# Server-only: clients without the mod (including vanilla clients) can join.
+displayTest = "IGNORE_ALL_VERSION"
+
+[[dependencies.seedguard]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${mc_range}"
+ordering = "NONE"
+side = "BOTH"
